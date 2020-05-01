@@ -1,0 +1,49 @@
+image: ondrejsika/ci
+
+stages:
+  - build
+  - dev
+  - prod
+
+variables:
+  IMAGE_ANT: $CI_REGISTRY_IMAGE/ant:$CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA-$CI_PIPELINE_ID
+  HOST_DEV_ANT: faker-ant-$CI_COMMIT_REF_SLUG.$KUBE_INGRESS_BASE_DOMAIN
+  HOST_PROD_ANT: faker-ant.$KUBE_INGRESS_BASE_DOMAIN
+
+# === Backend Python Ant ===
+
+build ant:
+  stage: build
+  script:
+    - docker login $CI_REGISTRY -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD
+    - docker build -t $IMAGE_ANT backend-python-ant
+    - docker push $IMAGE_ANT
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - backend-python-ant/**/*
+
+deploy dev ant:
+  stage: dev
+  script:
+    - helm upgrade --install faker-ant-$CI_COMMIT_REF_SLUG ./helm/faker-ant -n default --set image=$IMAGE_ANT --set replicas=20 --set host=$HOST_DEV_ANT
+  environment:
+    name: dev/faker-ant/$CI_COMMIT_REF_SLUG
+    url: https://$HOST_DEV_ANT
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - backend-python-ant/**/*
+
+deploy prod ant:
+  stage: prod
+  script:
+    - helm upgrade --install faker-ant ./helm/faker-ant -n default --set image=$IMAGE_ANT --set replicas=20 --set host=$HOST_PROD_ANT
+  environment:
+    name: prod/faker-ant
+    url: https://$HOST_PROD_ANT
+
+  only:
+    changes:
+      - .gitlab-ci.yml
+      - backend-python-ant/**/*
