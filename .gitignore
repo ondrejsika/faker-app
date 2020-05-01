@@ -1,0 +1,10 @@
+# General
+*.backup
+*.log
+
+# Mac
+.DS_Store
+
+# Python
+__pycache__
+
