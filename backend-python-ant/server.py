@@ -11,16 +11,35 @@ import random
 import collections
 import quotes
 import prometheus_client
+import os
+
+
+def _env_str(name, default):
+    return str(os.environ.get("FAKER_%s" % name, default))
+
+
+def _env_int(name, default):
+    return int(os.environ.get("FAKER_%s" % name, default))
+
+
+def _env_bool(name):
+    return os.environ.get("FAKER_%s" % name, "").lower() in ("1", "true")
 
 
 root_parser = argparse.ArgumentParser()
-root_parser.add_argument("--host", type=str, default="0.0.0.0")
-root_parser.add_argument("--port", type=int, default=80)
-root_parser.add_argument("--metrics-port", type=int, default=8080)
-root_parser.add_argument("--instance", type=int, default=0)
-root_parser.add_argument("--wait", type=int)
-root_parser.add_argument("--debug", action="store_true")
-root_parser.add_argument("--debug-ws", action="store_true")
+root_parser.add_argument(
+    "--host", type=str, default=_env_str("HOST", "0.0.0.0"))
+root_parser.add_argument("--port", type=int, default=_env_int("PORT", 80))
+root_parser.add_argument("--metrics-port", type=int,
+                         default=_env_int("METRICS_PORT", 8080))
+root_parser.add_argument("--instance", type=int,
+                         default=_env_int("INSTANCE", 0))
+root_parser.add_argument(
+    "--wait", type=int, default=_env_int("WAIT", 0) or None)
+root_parser.add_argument("--debug", action="store_true",
+                         default=_env_bool("DEBUG"))
+root_parser.add_argument(
+    "--debug-ws", action="store_true", default=_env_bool("DEBUG_WS"))
 
 args = root_parser.parse_args()
 
@@ -36,6 +55,7 @@ prom_counter = prometheus_client.Counter("message", "Number of send messages")
 
 CLIENTS = set()
 COUNTER = collections.Counter()
+
 
 def random_quote():
     return "%s: %s" % quotes.Quotes().random()
