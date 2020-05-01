@@ -9,6 +9,8 @@ import logging
 import argparse
 import random
 import collections
+import quotes
+
 
 root_parser = argparse.ArgumentParser()
 root_parser.add_argument("--host", type=str, default="0.0.0.0")
@@ -30,6 +32,9 @@ BACKEND_ID = "%s-%d-%d" % (HOSTNAME, args.instance, STARTUP_TIME)
 
 CLIENTS = set()
 COUNTER = collections.Counter()
+
+def random_quote():
+    return "%s: %s" % quotes.Quotes().random()
 
 
 def register(websocket):
@@ -57,7 +62,7 @@ async def hello(websocket, path):
                 "counter": COUNTER[websocket],
                 "counter_total": COUNTER["_total"],
                 "timestamp": int(time.time()),
-                "message": "Hello world from %s" % HOSTNAME,
+                "message": random_quote(),
             })
             await websocket.send(payload)
             logging.debug("%s %s" % (BACKEND_ID, payload))
