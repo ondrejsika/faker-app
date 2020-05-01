@@ -1,5 +1,4 @@
 apiVersion: v1
-# appVersion: "0"
 description: Faker Ant Backend
 name: faker-ant
 version: 0.2.0
