@@ -7,3 +7,4 @@ RUN pipenv install
 COPY . .
 ENTRYPOINT ["pipenv", "run", "python", "server.py"]
 EXPOSE 80
+EXPOSE 8080
