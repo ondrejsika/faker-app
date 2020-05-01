@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  {{ if .Values.changeCause }}
+  annotations:
+    kubernetes.io/change-cause: {{ .Values.changeCause }}
+  {{ end }}
+  labels:
+    release: {{ .Release.Name }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{include (print $.Template.BasePath "/configmap.yml") . | sha256sum}}
+      labels:
+        release: {{ .Release.Name }}
+    spec:
+      {{ if .Values.imagePullSecrets }}
+      imagePullSecrets:
+      - name: {{ .Values.imagePullSecrets}}
+      {{ end }}
+      containers:
+        - name: main
+          image: {{ .Values.image }}
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          envFrom:
+          - configMapRef:
+              name: {{ .Release.Name }}

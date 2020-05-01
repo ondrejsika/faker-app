@@ -1,0 +1,5 @@
+image: fakerco/faker-ant
+host: faker-ant.local
+changeCause: null
+replicas: 1
+imagePullSecrets: null
