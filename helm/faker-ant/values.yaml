@@ -3,3 +3,7 @@ host: faker-ant.local
 changeCause: null
 replicas: 1
 imagePullSecrets: null
+
+FAKER_WAIT: null
+FAKER_DEBUG: false
+FAKER_DEBUG_WS: false

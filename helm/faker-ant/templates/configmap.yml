@@ -4,3 +4,12 @@ kind: ConfigMap
 metadata:
   name: {{ .Release.Name }}
 data:
+  {{ if .Values.FAKER_WAIT }}
+  FAKER_WAIT: "{{ .Values.FAKER_WAIT }}"
+  {{ end }}
+  {{ if .Values.FAKER_DEBUG }}
+  FAKER_DEBUG: "true"
+  {{ end }}
+  {{ if .Values.FAKER_DEBUG_WS }}
+  FAKER_DEBUG_WS: "true"
+  {{ end }}
