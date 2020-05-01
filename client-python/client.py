@@ -20,10 +20,9 @@ logger.setLevel(logging.DEBUG if args.debug_ws else logging.INFO)
 
 
 async def hello(client):
-    uri = "ws://%s" % client
     while True:
         try:
-            async with websockets.connect(uri) as websocket:
+            async with websockets.connect(client) as websocket:
                 logging.info("CONNECTED:%s:%d" % (
                     websocket.remote_address[0], websocket.remote_address[1]))
                 try:
